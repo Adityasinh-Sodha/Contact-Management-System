@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Contact Management System</h1>
+            <input type="text" id="searchInput" placeholder="Search Contacts..." />
+            <button id="addContactBtn">+ Add Contact</button>
+        </header>
+
+        <div class="contact-list" id="contactList"></div>
+
+        <div class="delete-zone" id="deleteZone">
+            <img src="assets/dustbin2.png" alt="Dustbin" />
+        </div>
+    </div>
+
+    <div class="modal" id="contactModal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeModal">&times;</span>
+            <h2 id="modalTitle">Add Contact</h2>
+            <form id="contactForm">
+                <input type="text" id="name" placeholder="Name" required>
+                <span class="error" id="nameError"></span>
+                <input type="email" id="email" placeholder="Email" required>
+                <span class="error" id="emailError"></span>
+                <input type="tel" id="phone" placeholder="Phone" required>
+                <span class="error" id="phoneError"></span>
+                <input type="text" id="photoUrl" placeholder="Photo URL (optional)">
+                <textarea id="notes" placeholder="Notes"></textarea>
+                <label for="gender">Gender:</label>
+<select id="gender">
+    
+    <option value="Male">Male</option>
+    <option value="Female">Female</option>
+</select>
+                <button type="submit" id="saveBtn">Save</button>
+
+
+
+
+
+            </form>
+        </div>
+    </div>
+
+
+    <script src="script.js"></script>
+</body>
+</html>
