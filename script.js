@@ -15,35 +15,33 @@ deleteZone.addEventListener("drop", handleDelete);
 // Function to generate a DiceBear avatar URL based on gender
 function fetchAvatarUrl(gender) {
     const seed = Math.random().toString(36).substring(2); // Unique seed for each avatar
-    let style;
-
-    // Choose avatar style based on gender
-    if (gender === "Male") {
-        style = "micah";
-    } else if (gender === "Female") {
-        style = "avataaars";
-    } 
-
+    let style = gender === "Male" ? "micah" : "avataaars";
     return `https://api.dicebear.com/6.x/${style}/png?seed=${seed}`;
 }
 
 function saveContact(event) {
     event.preventDefault();
+    console.log("Save contact triggered");
+
     const name = document.getElementById("name").value.trim();
     const email = document.getElementById("email").value.trim();
     const phone = document.getElementById("phone").value.trim();
-    const gender = document.getElementById("gender").value; // New gender field
+    const gender = document.getElementById("gender").value;
 
-    if (!validateContact(name, email, phone)) return;
+    if (!validateContact(name, email, phone)) {
+        console.error("Validation failed");
+        return;
+    }
 
-    const photoUrl = document.getElementById("photoUrl").value || fetchAvatarUrl(gender); // Use gender-specific avatar
+    const photoUrl = document.getElementById("photoUrl").value || fetchAvatarUrl(gender);
     const notes = document.getElementById("notes").value.trim();
-
     const contact = { name, email, phone, photoUrl, notes, gender };
 
     if (editingIndex >= 0) {
+        console.log(`Editing contact at index ${editingIndex}`);
         contacts[editingIndex] = contact;
     } else {
+        console.log("Adding new contact");
         contacts.push(contact);
     }
 
@@ -53,8 +51,6 @@ function saveContact(event) {
 }
 
 function validateContact(name, email, phone) {
-    let isValid = true;
-
     const nameError = document.getElementById("nameError");
     const emailError = document.getElementById("emailError");
     const phoneError = document.getElementById("phoneError");
@@ -63,33 +59,44 @@ function validateContact(name, email, phone) {
     emailError.textContent = email ? "" : "Email is required.";
     phoneError.textContent = phone ? "" : "Phone is required.";
 
-    isValid = name && email && phone;
-
-    return isValid;
+    return name && email && phone;
 }
 
 function displayContacts(filteredContacts = contacts) {
     const contactList = document.getElementById("contactList");
-    contactList.innerHTML = "";
+    contactList.innerHTML = ""; // Clear previous content
 
     filteredContacts.forEach((contact, index) => {
         const card = document.createElement("div");
         card.className = "contact-card";
-        card.draggable = true;
-
-        card.addEventListener("dragstart", (e) => {
-            e.dataTransfer.setData("text/plain", index);
-        });
 
         card.innerHTML = `
-            <img src="${contact.photoUrl}" alt="Contact Photo">
-            <h3>${contact.name}</h3>
-            <p>${contact.phone}</p>
+            <div class="card-inner">
+                <div class="card-front">
+                    <img src="${contact.photoUrl}" class="card-photo" alt="Contact Photo">
+                    <h3 class="card-name">${contact.name}</h3>
+                    <p class="card-phone">${contact.phone}</p>
+                </div>
+                <div class="card-back">
+                    <h3>${contact.name}</h3>
+                    <p>Email: ${contact.email}</p>
+                    <p>Notes: ${contact.notes}</p>
+                </div>
+            </div>
         `;
-        card.addEventListener("click", () => openModal(contact, index));
+
+        const cardInner = card.querySelector(".card-inner");
+
+        // Add event listener for clicking on the card
+        cardInner.addEventListener("click", () => {
+            openModal(contact, index); // Open the edit form
+        });
+
+        // Append the card to the contact list
         contactList.appendChild(card);
     });
 }
+
 
 function filterContacts() {
     const query = document.getElementById("searchInput").value.toLowerCase();
@@ -109,7 +116,7 @@ function openModal(contact = null, index = -1) {
     document.getElementById("phone").value = contact?.phone || "";
     document.getElementById("notes").value = contact?.notes || "";
     document.getElementById("photoUrl").value = contact?.photoUrl || "";
-    document.getElementById("gender").value = contact?.gender || "Neutral"; // Default to Neutral
+    document.getElementById("gender").value = contact?.gender || "Neutral";
     document.getElementById("contactModal").style.display = "flex";
 }
 
