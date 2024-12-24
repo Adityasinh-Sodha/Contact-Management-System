@@ -1,4 +1,4 @@
-# Contact Management System
+# Contact Management System(CMS)
 
 This project is a web-based Contact Management System that allows users to manage their contacts with an intuitive interface. The system includes features such as adding, editing, deleting, and searching contacts. It also provides an interactive random avatar.
 
