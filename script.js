@@ -1,47 +1,63 @@
-let contacts = JSON.parse(localStorage.getItem("contacts")) || [];
+// Define default template contacts
+const defaultContacts = [
+    {
+        name: "Template Contact 1",
+        email: "template1@example.com",
+        phone: "123-456-7890",
+        photoUrl: "https://api.dicebear.com/6.x/micah/png?seed=template1",
+        notes: "This is a template contact. Feel free to edit or delete it.",
+        gender: "Male",
+    },
+    {
+        name: "Template Contact 2",
+        email: "template2@example.com",
+        phone: "987-654-3210",
+        photoUrl: "https://api.dicebear.com/6.x/avataaars/png?seed=template2",
+        notes: "This is another template contact. Customize or remove it as needed.",
+        gender: "Female",
+    },
+];
+
+// Load contacts from localStorage or initialize with default template contacts
+let contacts = JSON.parse(localStorage.getItem("contacts")) || [...defaultContacts];
 let editingIndex = -1;
 
+// Add event listeners for UI interactions
 document.getElementById("addContactBtn").addEventListener("click", () => openModal());
 document.getElementById("closeModal").addEventListener("click", closeModal);
 document.getElementById("contactForm").addEventListener("submit", saveContact);
 document.getElementById("searchInput").addEventListener("input", filterContacts);
 
+// Handle delete zone interactions
 const deleteZone = document.getElementById("deleteZone");
 deleteZone.addEventListener("dragover", (e) => e.preventDefault());
 deleteZone.addEventListener("dragenter", () => deleteZone.classList.add("over"));
 deleteZone.addEventListener("dragleave", () => deleteZone.classList.remove("over"));
 deleteZone.addEventListener("drop", handleDelete);
 
-// Function to generate a DiceBear avatar URL based on gender
 function fetchAvatarUrl(gender) {
-    const seed = Math.random().toString(36).substring(2); // Unique seed for each avatar
+    const seed = Math.random().toString(36).substring(2);
     let style = gender === "Male" ? "micah" : "avataaars";
     return `https://api.dicebear.com/6.x/${style}/png?seed=${seed}`;
 }
 
 function saveContact(event) {
     event.preventDefault();
-    console.log("Save contact triggered");
 
     const name = document.getElementById("name").value.trim();
     const email = document.getElementById("email").value.trim();
     const phone = document.getElementById("phone").value.trim();
     const gender = document.getElementById("gender").value;
 
-    if (!validateContact(name, email, phone)) {
-        console.error("Validation failed");
-        return;
-    }
+    if (!validateContact(name, email, phone)) return;
 
     const photoUrl = document.getElementById("photoUrl").value || fetchAvatarUrl(gender);
     const notes = document.getElementById("notes").value.trim();
     const contact = { name, email, phone, photoUrl, notes, gender };
 
     if (editingIndex >= 0) {
-        console.log(`Editing contact at index ${editingIndex}`);
         contacts[editingIndex] = contact;
     } else {
-        console.log("Adding new contact");
         contacts.push(contact);
     }
 
@@ -64,7 +80,7 @@ function validateContact(name, email, phone) {
 
 function displayContacts(filteredContacts = contacts) {
     const contactList = document.getElementById("contactList");
-    contactList.innerHTML = ""; // Clear previous content
+    contactList.innerHTML = "";
 
     filteredContacts.forEach((contact, index) => {
         const card = document.createElement("div");
@@ -86,17 +102,16 @@ function displayContacts(filteredContacts = contacts) {
         `;
 
         const cardInner = card.querySelector(".card-inner");
+        cardInner.addEventListener("click", () => openModal(contact, index));
 
-        // Add event listener for clicking on the card
-        cardInner.addEventListener("click", () => {
-            openModal(contact, index); // Open the edit form
+        card.draggable = true;
+        card.addEventListener("dragstart", (e) => {
+            e.dataTransfer.setData("text/plain", index);
         });
 
-        // Append the card to the contact list
         contactList.appendChild(card);
     });
 }
-
 
 function filterContacts() {
     const query = document.getElementById("searchInput").value.toLowerCase();
